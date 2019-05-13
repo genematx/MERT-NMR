@@ -1,0 +1,47 @@
+! this file = 1150my_t1t2.spc.par
+! 
+! script file = 1150my_t1t2.script
+! input data file = 1150proj1243.spc
+! output data file = 1150my_t1t2.spc
+! 
+! 	Script 1 (dimensions 1, 2) has 1 command:
+! 		Command 1: interlace
+! 	Script 2 (dimension 1) has 6 commands:
+! 		Command 1: complex
+! 		Command 2: avance 12 16 (lookup=2292, phase=25785, shift=72)
+! 		Command 3: conv_sine 8
+! 		Command 4: fft
+! 		Command 5: avance_phase (ph0=0, ph1=-135)
+! 		Command 6: ifft
+! 	Script 3 (dimension 2) has 1 command:
+! 		Command 1: complex
+
+ndim 3
+file 1150my_t1t2.spc
+
+dim 1
+npts 1024
+block 128
+sw 1000.000
+sf 500.000
+refppm 0.0000
+refpt 1.0000
+nuc 1H
+
+dim 2
+npts 256
+block 16
+sw 1000.000
+sf 500.000
+refppm 0.0000
+refpt 1.0000
+nuc 1H
+
+dim 3
+npts 8
+block 2
+sw 1000.000
+sf 500.000
+refppm 0.0000
+refpt 1.0000
+nuc 1H

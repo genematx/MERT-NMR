@@ -1,0 +1,19 @@
+input 1150proj1243.spc.par
+
+output 1150my_t1t2.spc
+
+interlace 2
+
+script_com 1
+        complex
+        avance 12 16
+        conv_sine 8
+!        sinebell 60            ! Cosine squared window function.
+        fft
+        avance_phase
+        ifft
+end_script
+
+script_com 2                    ! Commands for d1 processing.
+        complex                 ! For complex data acquisition in d1
+end_script
