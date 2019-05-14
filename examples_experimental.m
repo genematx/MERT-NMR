@@ -37,7 +37,7 @@ switch example
 end;
 
 % Load a specific Azara file (1150-T1, 1151-T1rho, 1155-T2)
-[yT, c_ref, f_ref] = loadData_115x(example);
+[yT, c_ref, f_ref, t, del] = loadData_115x(example);
 
 % % Uncomment to use the original parameters determined by peak-picking without optimization
 % best_chsh(1:size(orig_chsh,1), :) = orig_chsh;
@@ -49,26 +49,11 @@ end;
 
 nt = size(yT); nt1 = nt(1); nt2 = nt(2);      % Number of points in each time dimension
 n_peaks = size(best_chsh, 1);    % Total number of peaks
-
-%% Estimate noise level
-yFr = real(ffthc(yT(:,:,indY), [nt1, nt2], 'none', 'bicomplex')) / sqrt(nt1*nt2);
-f1n = linspace(-fs1/2, fs1/2, nt1+1); f1n = f1n(1:end-1);
-f2n = linspace(-fs2/2, fs2/2, nt2+1); f2n = f2n(1:end-1);
-del1n = (f1n + f_ref(1) ) /c_ref(1) ;  %   Frequency scale in ppm (for even number of points)
-del2n = (f2n + f_ref(2) ) /c_ref(2) ;
-for i = 1 : size(best_chsh, 1)
-    yFr(and(del1n > best_chsh(i, 1)-0.5, del1n < best_chsh(i, 1)+0.5), :) = NaN;
-    yFr(:, and(del2n > best_chsh(i, 2)-0.5, del2n < best_chsh(i, 2)+0.5)) = NaN;
-end
-yFr_bsln = wsmooth(yFr,linspace(0,1,nt2),linspace(0,1,nt1), 2.5);     % Aproximate the baseline
-nFr = yFr - yFr_bsln;              % Only noise
-nFr = nFr(:);
-nFr = nFr(~isnan(nFr));
-sig_est = std(nFr);
+n_echo = numel(t_echo);          % Number of relaxation planes
 
 %% Fit the baseline
 % Construct the model signal
-Z = getModelMatrix(best_chsh, best_alpha, c_ref, f_ref, t1, t2, 'tau', best_tau);
+Z = getModelMatrix(best_chsh, best_alpha, c_ref, f_ref, t{1}, t{2}, 'tau', best_tau);
 ZZ = transpose(conj(Z))*Z;
 Zy = transpose(conj(Z)) * reshape(yT(:, :, indY), [], 1);
 ZZi = inv(ZZ);
@@ -118,6 +103,7 @@ peaks_plot_2 = real(ffthc(xT(:,:,:), [nf1, nf2], 'sinebell', 'complex'));
 n_peaks = size(best_chsh, 1);    % Total number of peaks
 indx_plot = 1:n_peaks;    % Which peaks to mark and label
 indx_label = 1:n_peaks;
+del1 = del{1}; del2 = del{2};
 
 lvl_min = 0.04*max([peaks_plot_1(:); peaks_plot_2(:)]);
 lvl_max = 0.85*max([peaks_plot_1(:); peaks_plot_2(:)]);

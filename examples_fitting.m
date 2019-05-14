@@ -22,7 +22,8 @@ switch example
         t_echo = [0.0144 0.0288 0.0432 0.0576 0.072 0.0864 0.1008 0.1152 0.1296 0.144];
 end;
 
-loadData_115x(example);    % Load a specific Azara file (1150-T1, 1151-T1rho, 1155-T2)
+% Load a specific Azara file (1150-T1, 1151-T1rho, 1155-T2)
+[yT, c_ref, f_ref, t, del] = loadData_115x(example);
 
 % Initialize the results
 best_chsh = orig_chsh; best_alpha = orig_alpha;
@@ -33,6 +34,7 @@ best_alpha = best_alpha(1:104, :);
 
 nt = size(yT); nt1 = nt(1); nt2 = nt(2);      % Number of points in each time dimension
 n_peaks = size(best_chsh, 1);    % Total number of peaks
+n_echo = numel(t_echo);          % Number of relaxation planes
 
 %% Fit the model to the data
 %% Step 1. Initialization of the parameters
@@ -83,7 +85,7 @@ for kk = [4, 9, 10]      %    [18    20    39    45    48    49    71    73   10
         O = eye(4*n_peaks) - K; O = O(indx_optm{kk}, :);   % Optimize
         K = pars_new*K;
     end;
-    costFunc_rdcd = @(x) costFunc_VP(yT(:,:,1), x*O+K, c_ref, f_ref, t1, t2);
+    costFunc_rdcd = @(x) costFunc_VP(yT(:,:,1), x*O+K, c_ref, f_ref, t{1}, t{2});
     pars_0 = [pars_new(indx_optm{kk})];
    
 % --- MATLAB global search

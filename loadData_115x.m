@@ -1,4 +1,4 @@
-function [yT, c_ref, f_ref] = loadData_115x(example)
+function [yT, c_ref, f_ref, t, del] = loadData_115x(example)
 % A function to load the relaxation experiments data. Takes as its input an
 % integer encoding a particular example:
 % 1150 - T1
@@ -9,6 +9,9 @@ function [yT, c_ref, f_ref] = loadData_115x(example)
 % yT - the time-domain signal
 % c_ref -- spectrometer frequencies in MHz in both dimensions
 % f_ref -- frequency offsets in both spectral dimensions
+% t -- a 1_x_2 cell array; each cell is an array of time samples in both
+%      dimension.
+% del -- similar arrays of chemical shifts
 
 %% Open the Azara file
 fid = fopen(fullfile('_data', [num2str(example), 'my_t1t2.spc']));
@@ -94,6 +97,8 @@ t1 = [0:nt1-1]'*dt1;        % Time in seconds
 % Update the parameters
 c_ref = [c1_ref; c2_ref];
 f_ref = [f1_ref; f2_ref];
+t = {t1, t2};
+del = {del1, del2};
 
 end
 
