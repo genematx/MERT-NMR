@@ -41,7 +41,7 @@ end;
 
 % % Uncomment to use the original parameters determined by peak-picking without optimization
 % best_chsh(1:size(orig_chsh,1), :) = orig_chsh;
-% best_alpha(1:size(orig_alpha, 1), :) = orig_alpha / pi;
+% best_alpha(1:size(orig_alpha, 1), :) = orig_alpha;
 
 % % Only analyze the first 104 peaks
 % best_chsh = best_chsh(1:104, :);
@@ -68,7 +68,7 @@ temp = reshape(temp,[nb1*block1,nb2*block2,nb3*block3]);
 yT = bicomplex((temp(1:2:end, 2:2:end, :)+1i*temp(2:2:end, 2:2:end, :)), ...
     -(temp(1:2:end, 1:2:end, :)+1i*temp(2:2:end, 1:2:end, :)));
 yT = yT(1:440, :, :);               % Cut the part left due to the initial delay
-yT = yT / norm(norm(yT(:,:,1)));    % Just scale everything by a constant
+yT = yT / norm(norm(yT(:,:,1)));
 % Phase for plotting (only for the T1rho and T2 experiments)
 if example == 1151
     yT = yT .* bicomplex( exp(1i*0)*ones(size(yT)), exp(1i*pi)*ones(size(yT)), ones(size(yT)) );
@@ -91,7 +91,7 @@ del2 = (f2 + f2_ref ) /c2_ref ;  %
 t1 = [0:nt1-1]'*dt1;           % Time in seconds
 t2 = [0:nt2-1]'*dt2;
 n_echo = numel(t_echo);
-%% Cut only an interesting part in the spectrum (i.e. 6.2...10.2 ppm in the 1H direction)
+%% Cut only an interesting part of the spectrum (i.e. 6.2...10.2 ppm in the 1H direction)
 ind_cut = [234:361];      % Indices in the frequency domain to cut (an even number)          ind_cut = [80:207];
 yt1 = NaN(nt1, 2*nt2, n_echo);     % Data in time domain, complex values along the 1st dimension, R-I-R-I-... along the second
 yt1(:, 1:2:end, :) = cmpl1(yT(:,:,:)); yt1(:, 2:2:end, :) = cmpl2(yT(:,:,:));
