@@ -1,0 +1,38 @@
+Last Modified on 31 December 2009
+Created by Edward L. Zechmann
+
+
+
+The main program is random_band.m
+
+
+
+Description
+
+
+The test signal has an instantaneous frequency which randomly
+varies within the specified frequency range.  The instantaneous level 
+is constant, the maximum amplitude is 1.   
+
+The test signal is constructed by generating a a set of random number 
+for the instantaneous frequency as a function of time.  
+The instantaneous frequency is integrated to yield the phase angle. 
+The trigonometric sin function is used to construct the real part of the 
+amplitude.  
+
+Filtering and normalizing is used to remove artifacts from the random 
+number generation.  The resulting test signal is not a warble tone and 
+it is not pink, white, or brown noise.  
+
+The resulting test signal has characteristics of a warble tone.   
+The level is more constant and the frequency is band limited
+like a warble tone.  There is still some random variation in 
+instantaneous frequency like white noise.  
+
+
+[signal, inst_Frequency, inst_level]=random_band(Fs, N, fc, duration,num_channels, make_plot);  
+
+The program returns a test signal (signal).  The user specifies the samping rate Fs, spectral 
+width of 1/N octave band, center frequency
+fc, duration in seconds, number of channels num_channels, and will make
+three plots if make_plot=1;  
