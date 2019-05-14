@@ -1,9 +1,23 @@
+%%
+% This script presents examples of analysing 2D bicomplex NMR data in the
+% time domain. Please select a specific example below.
+% Required inputs are:
+% 1. Time-domain relaxationdata in the Azara format
+% 2. Matrices of model parameters (chemical shifts and peak widths)
+%    estimated, for example during peak picking. Additionally, acquisition
+%    delays in both dimensions can be supplied for propper phasing of the
+%    spectrum for plotting.
+% 3. An array of relaxation times t_echo.
+% 
+% The result of computations is the array of relation rates along with
+% plots of modelled and experimntal spectra.
+
+%% Default parameters
 clear;
 s = RandStream('mcg16807','Seed',0);
 RandStream.setGlobalStream(s);
 addpath('_tools\whittaker_smoother');   % Whittaker smoother for baseline calculation
 
-%% Default parameters
 nf1 = 1024;        nf2 = 1024;       % Number of points in each dimension of the spectrum (after zero-filling)
 indY = 1;             % Use as the starting plane to plot
 xlims = [6.5 10]; ylims = [104 129];    % Limits for plotting the spectra
@@ -11,7 +25,7 @@ xlims = [6.5 10]; ylims = [104 129];    % Limits for plotting the spectra
 %% Choose an experiment to run
 example = 1150;
 switch example
-    case 1150  % T1 - bicomplex
+    case 1150  % T1
         load(fullfile('_data', 'fitted_pars_1150_108_ph'));
         fid = fopen(fullfile('_data', '1150my_t1t2.spc'));
         t_echo = [0.08 0.16 0.24 0.4 0.56 0.64 0.72 0.8];
