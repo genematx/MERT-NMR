@@ -1,5 +1,5 @@
 function Z = getModelMatrix(chsh, alpha, c_ref, f_ref, t1, t2, varargin)
-% Computes the value of the objective function for a 2D hypercomplex model
+% Computes the bicomplex model matrix given the values of parameters.
 %  ----------------------------- Inputs: ---------------------------------
 % yT - N_x_1 vector. Measured bicomplex data in the time domain.
 % chsh - K_x_2 matrix of model chemical shifts with rows corresponding to
@@ -27,6 +27,9 @@ function Z = getModelMatrix(chsh, alpha, c_ref, f_ref, t1, t2, varargin)
 %        domain). Each column of the matrix corresponds to a specific
 %        resonance.
 
+% Keep previously computed values
+persistent chsh_old alpha_old Z_old tau_old
+
 tau = [0 0];           % Default acquisition delays
 normalize = true;
 K = size(chsh, 1);     % Number of peaks
@@ -50,17 +53,41 @@ end;
 % Allocate memory for the model matrix
 Z = bicomplex(NaN(nt1*nt2, K), NaN(nt1*nt2, K));
 
+% Find which parameters have changed after the previous computation
+if sum([numel(tau_old) == 0, numel(chsh) ~= numel(chsh_old), numel(alpha) ~= numel(alpha_old)])   % The first run
+    indx_new = 1:K;        % Indices of the components that need to be recomputed
+    Z = bicomplex(NaN(nt1*nt2, K), NaN(nt1*nt2, K));
+elseif sum([tau_old ~= tau])
+    indx_new = 1:K;        % Indices of the components that need to be recomputed
+    Z = bicomplex(NaN(nt1*nt2, K), NaN(nt1*nt2, K));
+else                       % Only (possibly some of) chemical shifts and/or alphas have changed
+    [indx_new, ~] = find([chsh_old ~= chsh] + [alpha_old ~= alpha]);
+    indx_new = unique(indx_new);
+    Z = Z_old;
+    tau = tau_old;
+end;
+indx_new = indx_new(:)';
+
 % Compute Z for each peak separately
-omega = 2*pi*bsxfun(@minus, bsxfun(@times, chsh', c_ref), f_ref);    % An array of angular frequencies
-for i = 1 : K
-    S1 = exp(1i*omega(1, i)*(t1+tau(1)*(1e-06)) - alpha(i, 1)*t1) / sqrt(nt1);
-    S2 = exp(1i*omega(2, i)*(t2'+tau(2)*(1e-06)) - alpha(i, 2)*t2') / sqrt(nt2);
-    S1z = kron(real(S1), real(S2))+1i*kron(imag(S1), real(S2));
-    S2z = kron(real(S1), imag(S2))+1i*kron(imag(S1), imag(S2));
-    Z(:,i) = reshape(bicomplex(S1z, S2z), [], 1);
+if numel(indx_new) > 0     % If something has changed
+    omega = 2*pi*bsxfun(@minus, bsxfun(@times, chsh', c_ref), f_ref);    % An array of angular frequencies
+    for i = indx_new
+        S1 = exp(1i*omega(1, i)*(t1+tau(1)*(1e-06)) - alpha(i, 1)*t1) / sqrt(nt1);
+        S2 = exp(1i*omega(2, i)*(t2'+tau(2)*(1e-06)) - alpha(i, 2)*t2') / sqrt(nt2);
+        S1z = kron(real(S1), real(S2))+1i*kron(imag(S1), real(S2));
+        S2z = kron(real(S1), imag(S2))+1i*kron(imag(S1), imag(S2));
+        Z(:,i) = reshape(bicomplex(S1z, S2z), [], 1);
+    end;
+    
+    % Normalize the model matrix
+    if normalize
+        Z = Z*diag(1./sqrt(diag(real(transpose(conj(Z))*Z))));
+    end;
 end;
 
-% Normalize the model matrix
-if normalize
-    Z = Z*diag(1./sqrt(diag(real(transpose(conj(Z))*Z))));
-end;
+% Keep the parameters
+chsh_old = chsh;
+alpha_old = alpha;
+Z_old = Z;
+tau_old = tau;
+
