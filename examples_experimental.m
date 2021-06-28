@@ -53,7 +53,7 @@ n_echo = numel(t_echo);          % Number of relaxation planes
 
 %% Fit the baseline
 % Construct the model signal
-Z = getModelMatrix(best_chsh, best_alpha, c_ref, f_ref, t{1}, t{2}, 'tau', best_tau);
+Z = getModelMatrix(best_chsh, best_alpha, c_ref, f_ref, t{1}, t{2});
 ZZ = transpose(conj(Z))*Z;
 Zy = transpose(conj(Z)) * reshape(yT(:, :, indY), [], 1);
 ZZi = inv(ZZ);
